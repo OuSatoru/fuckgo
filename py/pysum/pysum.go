@@ -1,6 +1,7 @@
 package main
 
 // python2 module
+// py3 ref https://blog.filippo.io/building-python-modules-with-go-1-5/
 
 /*
 #cgo pkg-config: python
