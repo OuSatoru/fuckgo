@@ -1,0 +1,29 @@
+package main
+
+import "C"
+
+const xml_str = `<?xml version="1.0" encoding="UTF-8"?>
+<Persons>
+    <Person name="polaris" age="28">
+        <Career>无业游民</Career>
+        <Interests>
+            <Interest>编程</Interest>
+            <Interest>下棋</Interest>
+        </Interests>
+    </Person>
+    <Person Name="studygolang" Age="27">
+        <Career>码农</Career>
+        <Interests>
+            <Interest>编程</Interest>
+            <Interest>下棋</Interest>
+        </Interests>
+    </Person>
+</Persons>`
+
+type Xml struct {
+	Person []Person `xml:"Person"`
+}
+
+func main() {
+
+}
