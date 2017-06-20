@@ -1,8 +1,13 @@
 package main
 
 import "C"
+import (
+	"encoding/xml"
+	"fmt"
+	"log"
+)
 
-const xml_str = `<?xml version="1.0" encoding="UTF-8"?>
+const xmlStr = `<?xml version="1.0" encoding="UTF-8"?>
 <Persons>
     <Person name="polaris" age="28">
         <Career>无业游民</Career>
@@ -11,7 +16,7 @@ const xml_str = `<?xml version="1.0" encoding="UTF-8"?>
             <Interest>下棋</Interest>
         </Interests>
     </Person>
-    <Person Name="studygolang" Age="27">
+    <Person name="studygolang" age="27">
         <Career>码农</Career>
         <Interests>
             <Interest>编程</Interest>
@@ -20,10 +25,26 @@ const xml_str = `<?xml version="1.0" encoding="UTF-8"?>
     </Person>
 </Persons>`
 
-type Xml struct {
+type Result struct {
 	Person []Person `xml:"Person"`
 }
 
-func main() {
+type Person struct {
+	Name      string    `xml:"name,attr"`
+	Age       int       `xml:"age,attr"`
+	Career    string    `xml:"Career"`
+	Interests Interests `xml:"Interests"`
+}
 
+type Interests struct {
+	Interest []string `xml:"Interest"`
+}
+
+func main() {
+	var res Result
+	err := xml.Unmarshal([]byte(xmlStr), &res)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("%v\n", res)
 }
