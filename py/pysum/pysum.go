@@ -1,5 +1,7 @@
 package main
 
+// python2 module
+
 /*
 #cgo pkg-config: python
 #include <Python.h>
