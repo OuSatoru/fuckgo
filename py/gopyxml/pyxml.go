@@ -1,11 +1,5 @@
 package main
 
-import (
-	"encoding/xml"
-	"fmt"
-	"log"
-)
-
 const xmlStr = `<?xml version="1.0" encoding="UTF-8"?>
 <Persons>
     <Person name="polaris" age="28">
@@ -24,7 +18,7 @@ const xmlStr = `<?xml version="1.0" encoding="UTF-8"?>
     </Person>
 </Persons>`
 
-type Result struct {
+type OutOfDisk struct {
 	Person []Person `xml:"Person"`
 }
 
@@ -40,10 +34,5 @@ type Interests struct {
 }
 
 func main() {
-	var res Result
-	err := xml.Unmarshal([]byte(xmlStr), &res)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("%v\n", res)
+
 }
