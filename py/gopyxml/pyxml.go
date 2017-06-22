@@ -12,6 +12,7 @@ PyObject * sum(PyObject *, PyObject *);
 import "C"
 import "fmt"
 import "encoding/xml"
+import "unsafe"
 
 const xmlStr = `<?xml version="1.0" encoding="UTF-8"?>
 <Persons>
@@ -85,6 +86,7 @@ type RowBack struct {
 //export out_of_disk
 func out_of_disk(self, args *C.PyObject) *C.PyObject {
 	var xm *C.char
+	defer C.free(unsafe.Pointer(xm))
 	if C.PyArg_ParseTuple_S(args, &xm) == 0 {
 		return nil
 	}
