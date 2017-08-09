@@ -35,6 +35,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	// fmt.Println("trans: ", transLng(lng, lat), transLat(lng, lat))
 	switch typ {
 	case "bd09":
 		fmt.Print("火星坐标 ")
@@ -122,7 +123,7 @@ func outOfChina(lng, lat float64) bool {
 func transLng(lng, lat float64) float64 {
 	ret := 300.0 + lng + 2.0*lat + 0.1*lng*lng + 0.1*lng*lat + 0.1*math.Sqrt(math.Abs(lng))
 	ret += (20.0*math.Sin(6.0*lng*pi) + 20.0*math.Sin(2.0*lng*pi)) * 2.0 / 3.0
-	ret += (20.0 * math.Sin(lng*pi)) + 40.0*math.Sin(lng/3.0*pi)*2.0/3.0
+	ret += (20.0*math.Sin(lng*pi) + 40.0*math.Sin(lng/3.0*pi)) * 2.0 / 3.0
 	ret += (150.0*math.Sin(lng/12.0*pi) + 300.0*math.Sin(lng/30.0*pi)) * 2.0 / 3.0
 	return ret
 }
@@ -131,6 +132,6 @@ func transLat(lng, lat float64) float64 {
 	ret := -100.0 + 2.0*lng + 3.0*lat + 0.2*lat*lat + 0.1*lng*lat + 0.2*math.Sqrt(math.Abs(lng))
 	ret += (20.0*math.Sin(6.0*lng*pi) + 20.0*math.Sin(2.0*lng*pi)) * 2.0 / 3.0
 	ret += (20.0*math.Sin(lat*pi) + 40.0*math.Sin(lat/3.0*pi)) * 2.0 / 3.0
-	ret += (160.0*math.Sin(lat/12.0*pi) + 320*math.Sin(lat*pi/30.0)) * 2.0 / 3.0
+	ret += (160.0*math.Sin(lat/12.0*pi) + 320.0*math.Sin(lat*pi/30.0)) * 2.0 / 3.0
 	return ret
 }
