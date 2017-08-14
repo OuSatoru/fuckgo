@@ -2,3 +2,6 @@
 *.dll
 *.h
 *.so
+*.db
+cert
+build

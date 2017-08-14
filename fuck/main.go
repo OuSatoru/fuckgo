@@ -1,10 +1,30 @@
 package main
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type Branches struct {
+	Branch []Branch
+}
+
+type Branch struct {
+	Id       int     `json:"id"`
+	Distance float64 `json:"distance"`
+	Name     string  `json:"name"`
+}
 
 func main() {
-	f := "%s, %d"
-	s := "AAA"
-	d := 123
-	fmt.Printf(f, s, d)
+	var branch Branch
+	branch.Id = 1
+	branch.Distance = 3.4
+	branch.Name = "dfsf"
+	var branches []Branch
+	branches = append(branches, branch)
+	var bs Branches
+	bs.Branch = branches
+	b, _ := json.Marshal(branch)
+	fmt.Println(string(b))
+	fmt.Println(branch)
 }
