@@ -12,7 +12,7 @@ func main() {
 	ticker := time.NewTicker(10 * time.Second)
 	for {
 		<-ticker.C
-		if exists(fmt.Sprintf("/fr/data/dels/%s.over", yesterday())) {
+		if exists(fmt.Sprintf("/fr/data/xms/%s.over", yesterday())) {
 			continue
 		}
 		if exists(fmt.Sprintf("/home/sjxf/odsdata/%s/%s.end", yesterday(), yesterday())) {
