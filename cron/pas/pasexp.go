@@ -12,11 +12,11 @@ func main() {
 	ticker := time.NewTicker(10 * time.Second)
 	for {
 		<-ticker.C
-		if exists(fmt.Sprintf("/fr/data/xms/%s.over", yesterday())) {
+		if exists(fmt.Sprintf("/fr/data/xms/%s.pas", yesterday())) {
 			continue
 		}
-		if exists(fmt.Sprintf("/home/sjxf/odsdata/%s/%s.end", yesterday(), yesterday())) {
-			out, err := exec.Command("./exp.sh").Output()
+		if time.Now().Format("15") == "01" {
+			out, err := exec.Command("sh", "pasexp.sh").Output()
 			if err != nil {
 				log.Println(err)
 			}

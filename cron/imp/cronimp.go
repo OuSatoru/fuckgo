@@ -15,7 +15,7 @@ func main() {
 		if exists(fmt.Sprintf("/fr/data/xms/%s.end", yesterday())) {
 			continue
 		}
-		if exists(fmt.Sprintf("/fr/data/xms/%s.over", yesterday())) {
+		if exists(fmt.Sprintf("/fr/data/xms/%s.over", yesterday())) && exists(fmt.Sprintf("/fr/data/xms/%s.pas", yesterday())) {
 			log.Println("importing data into frxms")
 			out, err := exec.Command("./imp.sh").Output()
 			if err != nil {
