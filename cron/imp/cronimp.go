@@ -9,13 +9,13 @@ import (
 )
 
 func main() {
-	ticker := time.NewTicker(10 * time.Second)
+	ticker := time.NewTicker(30 * time.Second)
 	for {
 		<-ticker.C
-		if exists(fmt.Sprintf("/fr/data/dels/%s.end", yesterday())) {
+		if exists(fmt.Sprintf("/fr/data/xms/%s.end", yesterday())) {
 			continue
 		}
-		if exists(fmt.Sprintf("/fr/data/dels/%s.over", yesterday())) {
+		if exists(fmt.Sprintf("/fr/data/xms/%s.over", yesterday())) {
 			log.Println("importing data into frxms")
 			out, err := exec.Command("./imp.sh").Output()
 			if err != nil {
