@@ -6,5 +6,5 @@ import (
 )
 
 func main() {
-	fmt.Println(time.Now().Format("03"))
+	fmt.Println(time.Now().Add(-9*time.Hour).AddDate(0, 0, -1))
 }
