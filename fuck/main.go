@@ -2,9 +2,8 @@ package main
 
 import (
 	"fmt"
-	"time"
 )
 
 func main() {
-	fmt.Println(time.Now().Add(-9*time.Hour).AddDate(0, 0, -1))
+	fmt.Println(5023 / 100)
 }
