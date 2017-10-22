@@ -1,14 +1,25 @@
 // https://www.codewars.com/kata/ball-upwards/train/go
-package ballupwards
+package main
+
+import "fmt"
 
 func MaxBall(v0 int) int {
-	return v0
+	h := 0.0
+	var i int
+	for i = 1; ; i++ {
+		if hight(v0, i) > h {
+			h = hight(v0, i)
+		} else {
+			break
+		}
+	}
+	return i - 1
 }
 
-func km2ms(v float64) float64 {
-	return v / 3.6
+func hight(v, t int) float64 {
+	return float64(v)/3.6*float64(t)*0.1 - 0.5*9.81*float64(t)*float64(t)*0.1*0.1
 }
 
-func ms2km(v float64) float64 {
-	return v * 3.6
+func main() {
+	fmt.Println(MaxBall(25))
 }
