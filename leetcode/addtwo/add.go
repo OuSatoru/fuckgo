@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 )
 
@@ -39,16 +40,24 @@ func revStr(s string) string {
 }
 
 func toNode(sum int) *ListNode {
-	var l *ListNode
+	l := new(ListNode)
+	walk := l
 	s := strconv.Itoa(sum)
-	for i := 10 * (len(s) - 1); i < 10; i /= 10 {
-		l.Next = l
-		l.Val = sum / i
+	for i := int(math.Pow(10.0, float64(len(s)-1))); i >= 1; i /= 10 {
+		// fmt.Println(i)
+		walk.Val = sum / i
+		walk.Next = new(ListNode)
+		walk = walk.Next
 		sum = sum % i
 	}
-	return nil
+	return l
 }
 
 func main() {
-	fmt.Println(revInt(120))
+	n := toNode(1230)
+	for n.Next != nil {
+		fmt.Println(n.Val)
+		n = n.Next
+	}
+	fmt.Println(getNodeVal(n))
 }
