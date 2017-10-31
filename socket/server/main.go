@@ -23,10 +23,10 @@ func main() {
 
 func handleConn(conn net.Conn) {
 	defer conn.Close()
-	buf := make([]byte, 1024)
-	_, err := conn.Read(buf)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// buf := make([]byte, 1024)
+	// _, err := conn.Read(buf)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 	conn.Write([]byte("傻逼"))
 }
