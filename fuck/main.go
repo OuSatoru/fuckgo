@@ -1,15 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"encoding/hex"
+	"fmt"
+)
 
 func main() {
-	var spawns []int
-	m := []int{1, 0, 2, 4}
-	for i := 0; i < 4; i++ {
-		go func() {
-			spawns = append(spawns, m[3])
-		}()
-	}
-
-	fmt.Println(spawns)
+	str := "0000WA"
+	sh := hex.EncodeToString([]byte(str))
+	fmt.Println(sh)
 }
