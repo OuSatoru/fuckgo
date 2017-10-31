@@ -20,10 +20,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = conn.Write([]byte("HEAD / HTTP/1.0\r\n\r\n"))
-	if err != nil {
-		log.Fatal(err)
-	}
+	// _, err = conn.Write([]byte("HEAD / HTTP/1.0\r\n\r\n"))
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 	result, err := ioutil.ReadAll(conn)
 	if err != nil {
 		log.Fatal(err)
