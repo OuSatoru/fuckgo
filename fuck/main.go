@@ -1,9 +1,12 @@
 package main
 
 import (
+	"encoding/hex"
 	"fmt"
 )
 
 func main() {
-	fmt.Println(5023 / 100)
+	str := "0000WA"
+	sh := hex.EncodeToString([]byte(str))
+	fmt.Println(sh)
 }
