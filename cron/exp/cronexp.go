@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 )
 
@@ -16,11 +17,22 @@ func main() {
 			continue
 		}
 		if exists(fmt.Sprintf("/home/sjxf/odsdata/%s/%s.end", yesterday(), yesterday())) {
-			out, err := exec.Command("./exp.sh").Output()
+			_, err := exec.Command("db2", "connect to jsbods user ods using ods@98").Output()
 			if err != nil {
 				log.Println(err)
 			}
-			fmt.Printf("%s\n", out)
+			out, err := exec.Command("db2", "SELECT * FROM REPORT.ODS_ZBTJB WHERE SJRQ = to_char(CURRENT_DATE - 1 DAY, 'YYYYMMDD') AND ZBDH = '0001'").Output()
+			if err != nil {
+				log.Println(err)
+			}
+			// fmt.Printf("%s\n", out)
+			if !strings.Contains(string(out), "0 record(s) selected") {
+				out, err := exec.Command("./exp.sh").Output()
+				if err != nil {
+					log.Println(err)
+				}
+				fmt.Printf("%s\n", out)
+			}
 		}
 	}
 
