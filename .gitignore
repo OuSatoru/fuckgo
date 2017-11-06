@@ -5,3 +5,4 @@
 *.db
 cert
 build
+.idea
