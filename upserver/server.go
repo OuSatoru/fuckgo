@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"fmt"
 )
 
 func main() {
@@ -15,7 +14,6 @@ func main() {
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	id := r.Form.Get("id")
 }
 
 func upload(w http.ResponseWriter, r *http.Request) {
