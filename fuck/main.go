@@ -1,23 +1,27 @@
 package main
 
 import (
-	"bytes"
-	"encoding/binary"
-	"encoding/hex"
 	"fmt"
+	"log"
+	"os/exec"
+	"strings"
 )
 
 func main() {
-	str := "0000WA"
-	sh := hex.EncodeToString([]byte(str))
-	fmt.Println(sh)
-	buf := new(bytes.Buffer)
-	var data = []int8{2, 3}
-	for _, v := range data {
-		err := binary.Write(buf, binary.LittleEndian, v)
-		if err != nil {
-			fmt.Println(err)
-		}
+	_, err := exec.Command("db2", "connect to jsbods user ods using ods@98").Output()
+	if err != nil {
+		log.Println(err)
 	}
-	fmt.Printf("%v\n", buf.Bytes())
+	out, err := exec.Command("db2", "SELECT * FROM REPORT.ODS_ZBTJB WHERE SJRQ = to_char(CURRENT_DATE - 1 DAY, 'YYYYMMDD') AND ZBDH = '0001'").Output()
+	if err != nil {
+		log.Println(err)
+	}
+	fmt.Println(string(out))
+	if !strings.Contains(string(out), "0 record(s) selected") {
+		out, err := exec.Command("./exp.sh").Output()
+		if err != nil {
+			log.Println(err)
+		}
+		fmt.Printf("%s\n", out)
+	}
 }
