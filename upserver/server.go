@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 )
 
@@ -17,5 +18,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func upload(w http.ResponseWriter, r *http.Request) {
-
+	r.ParseForm()
+	for k, v := range r.Form {
+		fmt.Printf("%s %v", k, v)
+		fmt.Fprintf(w, "%s %v", k, v)
+	}
 }
