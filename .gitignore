@@ -6,3 +6,5 @@
 cert
 build
 .idea
+*.blob
+*.prs
