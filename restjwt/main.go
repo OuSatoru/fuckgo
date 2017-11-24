@@ -81,7 +81,7 @@ func ValidateTokenMiddleware(w http.ResponseWriter, r *http.Request, next http.H
 		func(token *jwt.Token) (interface{}, error) {
 			return verifyKey, nil
 		})
-	if err != nil {
+	if err == nil { // == nil!!
 		if token.Valid {
 			next(w, r)
 		} else {
