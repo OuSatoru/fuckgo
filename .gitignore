@@ -8,3 +8,6 @@ build
 .idea
 *.blob
 *.prs
+*.cer
+*.keystore
+*.pem
