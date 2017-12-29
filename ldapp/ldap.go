@@ -24,15 +24,23 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// fmt.Println(SearchUser(l, "sbdsb"))
-	// err = DelUser(l, "sbdsb")
+	// ls, err := ldap.Dial("tcp", fmt.Sprintf("%s:%d", "dtrcb.net", 636))
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
-	err = AddUser(l, "0601002", "0601", "OSB", "Enterprise Outsourcers")
-	if err != nil {
-		log.Fatal(err)
-	}
+	// defer ls.Close()
+
+	// err = ls.StartTLS(&tls.Config{InsecureSkipVerify: true})
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// err = ls.Bind(admin, adminpwd)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	fmt.Println(VerifyUser(l, "09800903", "13401766862"))
 }
 
 func SearchUser(l *ldap.Conn, username string) string {
@@ -84,6 +92,7 @@ func AddUser(l *ldap.Conn, cn, ou1, ou2, ou3 string) error {
 	add := ldap.NewAddRequest(fmt.Sprintf(
 		"cn=%s,ou=%s,ou=%s,ou=%s,dc=dtrcb,dc=net", cn, ou1, ou2, ou3))
 	add.Attribute("cn", []string{"0601002"})
+	add.Attribute("objectClass", []string{"user"})
 	add.Attribute("sn", []string{"金"})
 	add.Attribute("givenName", []string{"金刚"})
 	add.Attribute("displayName", []string{"金刚 (0601002)"})
@@ -114,4 +123,18 @@ func ModifyUser(l *ldap.Conn, method, user, attr string, val []string) error {
 		return err
 	}
 	return nil
+}
+
+func ModifyPassword(l *ldap.Conn, username, newPwd string) error {
+	toMod := SearchUser(l, username)
+	passwordModifyRequest := ldap.NewPasswordModifyRequest(toMod, "", newPwd)
+	_, err := l.PasswordModify(passwordModifyRequest)
+	return err
+}
+
+func ModifyDN(l *ldap.Conn, username, ou1, ou2, ou3 string) error {
+	toMod := SearchUser(l, username)
+	modRequest := ldap.NewModifyDNRequest(toMod, fmt.Sprintf("cn=%s", username), true, fmt.Sprintf(
+		"ou=%s,ou=%s,ou=%s,dc=dtrcb,dc=net", ou1, ou2, ou3))
+	return l.ModifyDN(modRequest)
 }
