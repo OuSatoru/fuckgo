@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	admin    = "DTRCB\\Administrator"
-	adminpwd = "Whjyxk722522"
+	admin    = "-"
+	adminpwd = "-"
 )
 
 func main() {
