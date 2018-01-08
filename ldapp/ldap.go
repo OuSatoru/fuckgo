@@ -40,7 +40,15 @@ func main() {
 	// 	log.Fatal(err)
 	// }
 
-	fmt.Println(VerifyUser(l, "09800903", "13401766862"))
+	// fmt.Println(SearchUser(l, "09800903"))
+	// err = DelUser(l, "sbdsb")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	err = AddUser(l, "09801010", "010602000", "010000000", "Enterprise Staffs")
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func SearchUser(l *ldap.Conn, username string) string {
@@ -91,14 +99,14 @@ func VerifyUser(l *ldap.Conn, username, password string) bool {
 func AddUser(l *ldap.Conn, cn, ou1, ou2, ou3 string) error {
 	add := ldap.NewAddRequest(fmt.Sprintf(
 		"cn=%s,ou=%s,ou=%s,ou=%s,dc=dtrcb,dc=net", cn, ou1, ou2, ou3))
-	add.Attribute("cn", []string{"0601002"})
+	add.Attribute("cn", []string{"09801010"})
 	add.Attribute("objectClass", []string{"user"})
-	add.Attribute("sn", []string{"金"})
-	add.Attribute("givenName", []string{"金刚"})
-	add.Attribute("displayName", []string{"金刚 (0601002)"})
-	add.Attribute("userPrincipalName", []string{"0601002@dtrcb.net"})
-	add.Attribute("sAMAccountname", []string{"0601002"})
-	add.Attribute("userpassword", []string{"13401766862"})
+	add.Attribute("sn", []string{"杨"})
+	add.Attribute("givenName", []string{"杨卫"})
+	add.Attribute("displayName", []string{"杨卫 (09801010)"})
+	add.Attribute("userPrincipalName", []string{"09801010@dtrcb.net"})
+	add.Attribute("sAMAccountname", []string{"09801010"})
+	add.Attribute("userpassword", []string{"15371158866"})
 	return l.Add(add)
 }
 
