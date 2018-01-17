@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strconv"
 	"time"
 )
 
@@ -12,7 +13,7 @@ func main() {
 	ticker := time.NewTicker(10 * time.Second)
 	for {
 		<-ticker.C
-		if exists(fmt.Sprintf("/fr/data/xms/%s.jx", yesterday())) {
+		if exists(fmt.Sprintf("/fr/data/xms/%s.jx", yesterday())) || hour() < 7 {
 			continue
 		}
 		_, err := exec.Command("db2", "connect to bcas_dt user bcas using `1qaz").Output()
@@ -46,6 +47,14 @@ func exists(path string) bool {
 		return false
 	}
 	return true
+}
+
+func hour() int {
+	h, err := strconv.Atoi(time.Now().Format("15"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	return h
 }
 
 func yesterday() string {
