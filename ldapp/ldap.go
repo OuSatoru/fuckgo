@@ -1,7 +1,10 @@
 package main
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"io/ioutil"
 	"log"
 
 	"gopkg.in/ldap.v2"
@@ -24,28 +27,37 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// ls, err := ldap.Dial("tcp", fmt.Sprintf("%s:%d", "dtrcb.net", 636))
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// defer ls.Close()
+	pool := x509.NewCertPool()
+	pem, err := ioutil.ReadFile("dtrcb-root.pem")
+	if err != nil {
+		log.Fatal(err)
+	}
+	pool.AppendCertsFromPEM(pem)
 
-	// err = ls.StartTLS(&tls.Config{InsecureSkipVerify: true})
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	ls, err := ldap.DialTLS("tcp", fmt.Sprintf("%s:%d", "dtrcb.net", 636), &tls.Config{
+		InsecureSkipVerify: true,
+		RootCAs:            pool,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer ls.Close()
 
-	// err = ls.Bind(admin, adminpwd)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	err = ls.Bind(admin, adminpwd)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// fmt.Println(SearchUser(l, "09800903"))
 	// err = DelUser(l, "sbdsb")
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
-	err = AddUser(l, "09801010", "010602000", "010000000", "Enterprise Staffs")
+	// err = AddUser(l, "09801010", "010602000", "010000000", "Enterprise Staffs")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	err = ModifyPassword(ls, "09800903", "13401766862", "17625094474")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -133,10 +145,15 @@ func ModifyUser(l *ldap.Conn, method, user, attr string, val []string) error {
 	return nil
 }
 
-func ModifyPassword(l *ldap.Conn, username, newPwd string) error {
+func ModifyPassword(l *ldap.Conn, username, oldPwd, newPwd string) error {
+	defer l.Bind(admin, adminpwd)
 	toMod := SearchUser(l, username)
-	passwordModifyRequest := ldap.NewPasswordModifyRequest(toMod, "", newPwd)
-	_, err := l.PasswordModify(passwordModifyRequest)
+	err := l.Bind(toMod, oldPwd)
+	if err != nil {
+		return err
+	}
+	passwordModifyRequest := ldap.NewPasswordModifyRequest(toMod, oldPwd, newPwd)
+	_, err = l.PasswordModify(passwordModifyRequest)
 	return err
 }
 
