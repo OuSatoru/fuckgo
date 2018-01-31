@@ -24,8 +24,12 @@ func main() {
 		if err != nil {
 			log.Println(err)
 		}
+		out2, err := exec.Command("db2", "SELECT * FROM REPORT.ODS_HXZZYEB WHERE SJRQ = to_char(CURRENT_DATE - 1 DAY, 'yyyymmdd') AND KMH = '91310000' FETCH FIRST 1 ROW ONLY").Output()
+		if err != nil {
+			log.Println(err)
+		}
 		// fmt.Printf("%s\n", out)
-		if !strings.Contains(string(out), "0 record(s) selected") {
+		if !strings.Contains(string(out), "0 record(s) selected") && strings.Contains(string(out2), yesterday()) {
 			out, err := exec.Command("./expzb.sh").Output()
 			if err != nil {
 				log.Println(err)
