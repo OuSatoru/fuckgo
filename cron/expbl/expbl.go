@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"strings"
+	"regexp"
 	"time"
 )
 
@@ -20,12 +20,13 @@ func main() {
 		if err != nil {
 			log.Println(err)
 		}
-		out, err := exec.Command("db2", "SELECT * FROM REPORT.ODS_HXZZYEB WHERE SJRQ = to_char(CURRENT_DATE - 1 DAY, 'yyyymmdd') AND KMH = '91310000' FETCH FIRST 1 ROW ONLY").Output()
+		out, err := exec.Command("db2", "SELECT SJRQ, SJZT FROM REPORT.FDM_SJRQ").Output()
 		if err != nil {
 			log.Println(err)
 		}
+		match, _ := regexp.MatchString(time.Now().Format("20060102")+`\s+1`, string(out))
 		// fmt.Printf("%s\n", out)
-		if !strings.Contains(string(out), "0 record(s) selected") {
+		if match {
 			out, err := exec.Command("./expbl.sh").Output()
 			if err != nil {
 				log.Println(err)
