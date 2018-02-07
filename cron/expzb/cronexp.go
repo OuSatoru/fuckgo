@@ -20,12 +20,12 @@ func main() {
 		if err != nil {
 			log.Println(err)
 		}
-		out, err := exec.Command("db2", "SELECT * FROM REPORT.ODS_ZBTJB WHERE SJRQ = to_char(CURRENT_DATE - 1 DAY, 'YYYYMMDD') AND ZBDH = '0001'").Output()
+		out, err := exec.Command("db2", "SELECT max(SJRQ) FROM REPORT.ODS_HXZZYEB").Output()
 		if err != nil {
 			log.Println(err)
 		}
 		// fmt.Printf("%s\n", out)
-		if !strings.Contains(string(out), "0 record(s) selected") {
+		if strings.Contains(string(out), yesterday()) {
 			out, err := exec.Command("./expzb.sh").Output()
 			if err != nil {
 				log.Println(err)
