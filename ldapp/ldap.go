@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 
+	"golang.org/x/text/encoding/unicode"
 	"gopkg.in/ldap.v2"
 )
 
@@ -39,12 +40,14 @@ func main() {
 		RootCAs:            pool,
 	})
 	if err != nil {
+		log.Println(111)
 		log.Fatal(err)
 	}
 	defer ls.Close()
 
 	err = ls.Bind(admin, adminpwd)
 	if err != nil {
+		log.Println(222)
 		log.Fatal(err)
 	}
 
@@ -57,8 +60,9 @@ func main() {
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
-	err = ModifyPassword(ls, "09800903", "13401766862", "17625094474")
+	err = ModifyPasswordAD(ls, "09800903", "17625094474", "13401766862")
 	if err != nil {
+		log.Println(333)
 		log.Fatal(err)
 	}
 }
@@ -108,18 +112,29 @@ func VerifyUser(l *ldap.Conn, username, password string) bool {
 	return false
 }
 
-func AddUser(l *ldap.Conn, cn, ou1, ou2, ou3 string) error {
-	add := ldap.NewAddRequest(fmt.Sprintf(
-		"cn=%s,ou=%s,ou=%s,ou=%s,dc=dtrcb,dc=net", cn, ou1, ou2, ou3))
-	add.Attribute("cn", []string{"09801010"})
+func AddUser(l *ldap.Conn, cn, ou1, ou2, ou3, sn, gn, mobile string) error {
+	dn := fmt.Sprintf("cn=%s,ou=%s,ou=%s,ou=%s,dc=dtrcb,dc=net", cn, ou1, ou2, ou3)
+	add := ldap.NewAddRequest(dn)
+	add.Attribute("cn", []string{cn})
 	add.Attribute("objectClass", []string{"user"})
-	add.Attribute("sn", []string{"杨"})
-	add.Attribute("givenName", []string{"杨卫"})
-	add.Attribute("displayName", []string{"杨卫 (09801010)"})
-	add.Attribute("userPrincipalName", []string{"09801010@dtrcb.net"})
-	add.Attribute("sAMAccountname", []string{"09801010"})
-	add.Attribute("userpassword", []string{"15371158866"})
-	return l.Add(add)
+	add.Attribute("sn", []string{sn})
+	add.Attribute("givenName", []string{gn})
+	add.Attribute("displayName", []string{fmt.Sprintf("%s (%s)", gn, cn)})
+	add.Attribute("userPrincipalName", []string{fmt.Sprintf("%s@dtrcb.net", cn)})
+	add.Attribute("sAMAccountname", []string{cn})
+	add.Attribute("userpassword", []string{mobile})
+	err := l.Add(add)
+	if err != nil {
+		return err
+	}
+	// https://github.com/go-ldap/ldap/issues/106
+	modReq := &ldap.ModifyRequest{
+		DN: dn,
+		ReplaceAttributes: []ldap.PartialAttribute{
+			{Type: "userAccountControl", Vals: []string{"512"}},
+		},
+	}
+	return l.Modify(modReq)
 }
 
 func DelUser(l *ldap.Conn, cn string) error {
@@ -145,7 +160,24 @@ func ModifyUser(l *ldap.Conn, method, user, attr string, val []string) error {
 	return nil
 }
 
-func ModifyPassword(l *ldap.Conn, username, oldPwd, newPwd string) error {
+func ModifyPasswordAD(l *ldap.Conn, username, oldPwd, newPwd string) error {
+	// https://github.com/go-ldap/ldap/issues/106
+	utf16 := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM)
+	pwdEncoded, err := utf16.NewEncoder().String("\"" + newPwd + "\"")
+	if err != nil {
+		return err
+	}
+	toMod := SearchUser(l, username)
+	passReq := &ldap.ModifyRequest{
+		DN: toMod,
+		ReplaceAttributes: []ldap.PartialAttribute{
+			{Type: "unicodePwd", Vals: []string{pwdEncoded}},
+		},
+	}
+	return l.Modify(passReq)
+}
+
+func ModifyPasswordLDAP(l *ldap.Conn, username, oldPwd, newPwd string) error {
 	defer l.Bind(admin, adminpwd)
 	toMod := SearchUser(l, username)
 	err := l.Bind(toMod, oldPwd)
