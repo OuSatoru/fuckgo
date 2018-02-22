@@ -40,14 +40,12 @@ func main() {
 		RootCAs:            pool,
 	})
 	if err != nil {
-		log.Println(111)
 		log.Fatal(err)
 	}
 	defer ls.Close()
 
 	err = ls.Bind(admin, adminpwd)
 	if err != nil {
-		log.Println(222)
 		log.Fatal(err)
 	}
 
@@ -62,7 +60,6 @@ func main() {
 	// }
 	err = ModifyPasswordAD(ls, "09800903", "17625094474", "13401766862")
 	if err != nil {
-		log.Println(333)
 		log.Fatal(err)
 	}
 }
