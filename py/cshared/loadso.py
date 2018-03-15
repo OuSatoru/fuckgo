@@ -1,5 +1,5 @@
 from ctypes import cdll
 
-lib = cdll.LoadLibrary("./csh.so")
+lib = cdll.LoadLibrary("godll.dll")
 
-print(lib.ForPy(4, 5))
+lib.GoCall('aa')
