@@ -25,8 +25,9 @@ func main() {
 	// fmt.Printf("%x\n", j)
 	// fmt.Printf("%s\n", string(Encode(j.Bytes())))
 
-	j := []byte(`{"f.h.jkdm":1234567890,"sdfd":"dd"}`)
-	Decode(j)
+	j := []byte(`{"f.h.jkdm":12345,"sdfd":"dd"}`)
+	fmt.Printf("%s\n", Decode(j))
+	fmt.Printf("%x\n", Decode(j))
 }
 
 // Encode : encoding NATP to json
@@ -70,10 +71,13 @@ func Decode(j []byte) []byte {
 		panic(err)
 	}
 	for k, v := range msr {
-		// if v.(int) {
-		// 	v = strconv.Itoa(v)
-		// }
-		fmt.Println(k, v)
+		n.WriteByte(byte(len(k)))
+		n.WriteString(k)
+		n.Write([]byte{0, 0, 0})
+		str := fmt.Sprintf("%v", v)
+		fmt.Println(str)
+		n.WriteByte(byte(len(str)))
+		n.WriteString(str)
 	}
 	return n.Bytes()
 }
