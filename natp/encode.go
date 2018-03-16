@@ -25,7 +25,7 @@ func main() {
 	// fmt.Printf("%x\n", j)
 	// fmt.Printf("%s\n", string(Encode(j.Bytes())))
 
-	j := []byte(`{"f.h.jkdm":12345,"sdfd":"dd"}`)
+	j := []byte(`{"f.h.jkdm":12345,"sdfd":""}`)
 	fmt.Printf("%s\n", Decode(j))
 	fmt.Printf("%x\n", Decode(j))
 }
