@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	numStr := "1"
+	numStr := "1000000000"
 	sha := sha256.New()
 	sha.Write([]byte(numStr))
 	fmt.Printf("%x\n", sha.Sum(nil))

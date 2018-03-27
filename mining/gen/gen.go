@@ -4,10 +4,13 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"strconv"
+	"time"
 )
 
 func main() {
-
+	start := time.Now()
+	fmt.Println(gen("52a5d4a071d82caea87329868d22f6b8390ac3d227c6fde0d4525e69510ec479"))
+	fmt.Println(time.Since(start))
 }
 
 func gen(sha string) string {
@@ -33,9 +36,9 @@ func gen(sha string) string {
 					a <- num
 					break
 				}
-				if num%10000 == 0 {
-					fmt.Println(num)
-				}
+				// if num%10000 == 0 {
+				// 	fmt.Println(num)
+				// }
 			}
 
 		}(ch, ans)
