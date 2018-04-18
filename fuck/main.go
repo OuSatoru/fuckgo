@@ -2,12 +2,23 @@ package main
 
 import (
 	"fmt"
-	"net/http"
+	"sync"
+	"time"
 )
 
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "%s - %v", r.RemoteAddr, r.Header)
-	})
-	http.ListenAndServe(":2333", nil)
+	var wg sync.WaitGroup
+
+	now := time.Now()
+	for i := 0; i < 1000000; i++ {
+		go func() {
+			wg.Add(1)
+			time.Sleep(5 * time.Second)
+			wg.Done()
+		}()
+	}
+
+	wg.Wait()
+
+	fmt.Printf("%v", time.Since(now))
 }
