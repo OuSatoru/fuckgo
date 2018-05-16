@@ -2,14 +2,23 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
+	"os/exec"
 	"path"
 	"strconv"
 	"time"
 
+	"github.com/fsnotify/fsnotify"
+
 	"github.com/OuSatoru/fuckgo/common"
+)
+
+var (
+	users = []string{"687", "1298", "1299"}
 )
 
 type jsonTime time.Time
@@ -42,13 +51,64 @@ type one struct {
 }
 
 type topic struct {
-	// Content     string `json:"content"`
-	// TopicOption string `json:"topicOption,omitempty"`
-	Answer string `json:"answer"`
+	Content     string `json:"content"`
+	TopicOption string `json:"topicOption,omitempty"`
+	Answer      string `json:"answer"`
 }
 
 func main() {
-	watchDir("F:\\Work\\Go\\src\\github.com\\OuSatoru\\fuckgo\\fuck\\examtest\\e84")
+	var bg bool
+	flag.BoolVar(&bg, "bg", true, "background, -bg=false/true")
+	flag.Parse()
+	if bg {
+		args := []string{}
+		for _, arg := range os.Args[1:] {
+			if arg != "-bg=false" {
+				args = append(args, arg)
+			}
+		}
+		cmd := exec.Command(os.Args[0], args...)
+		cmd.Start()
+		log.Printf("%s [PID] %d running...\n", os.Args[0], cmd.Process.Pid)
+		os.Exit(0)
+	}
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer watcher.Close()
+
+	done := make(chan bool)
+	go func() {
+		for {
+			select {
+			case event := <-watcher.Events:
+				log.Println("event:", event)
+				// if event.Op&fsnotify.Write == fsnotify.Write {
+				// 	log.Println("modified file:", event.Name)
+				// }
+				if isDir(event.Name) && event.Op == fsnotify.Create {
+					log.Println("create directory:", event.Name)
+					go watchDir(event.Name)
+				}
+			case err := <-watcher.Errors:
+				log.Println("error:", err)
+			}
+		}
+	}()
+	err = watcher.Add("F:\\Work\\afaafeaha")
+	if err != nil {
+		log.Fatal(err)
+	}
+	<-done
+}
+
+func isDir(p string) bool {
+	finfo, err := os.Stat(p)
+	if err != nil {
+		return false
+	}
+	return finfo.IsDir()
 }
 
 func watchDir(dir string) {
@@ -101,7 +161,6 @@ func watchDir(dir string) {
 				return
 			}
 			fmt.Println(topics)
-			break
 		}
 	}
 }

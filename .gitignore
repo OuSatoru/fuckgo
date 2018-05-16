@@ -12,3 +12,4 @@ build
 *.keystore
 *.pem
 *_linux_amd64
+examtest
