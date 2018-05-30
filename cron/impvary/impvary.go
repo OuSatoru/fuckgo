@@ -16,6 +16,8 @@ func main() {
 	wg.Add(1)
 	go task("rh")
 	go task("yq")
+	go task("jx")
+	go task("jxsjyh")
 	wg.Wait()
 }
 

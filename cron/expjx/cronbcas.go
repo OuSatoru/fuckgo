@@ -6,31 +6,45 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"sync"
 	"time"
 )
 
+var wg sync.WaitGroup
+
 func main() {
+	wg.Add(1)
+	go task1("jx", "SELECT count(*) FROM BCAS.D_PER_ACHV_%s WHERE ETLDT = %s")
+	go task1("jxsjyh", "SELECT count(*) FROM BCAS.D_PER_ACHV_%s WHERE ETLDT = %s AND FORMULA_CODE LIKE '57%'")
+	wg.Wait()
+}
+
+func task1(suffix, statusy string) {
+
 	ticker := time.NewTicker(10 * time.Second)
 	for {
 		<-ticker.C
-		if exists(fmt.Sprintf("/fr/data/xms/%s.jx", yesterday())) || hour() < 7 {
+		status := fmt.Sprintf(statusy, time.Now().Format("2006"), "current_date - 1 day")
+		zeros := fmt.Sprintf(statusy, time.Now().Format("2006"), "'"+time.Now().AddDate(1, 0, 0).Format("2006-01-02")+"'")
+		if exists(fmt.Sprintf("/fr/data/xms/%s.%s", yesterday(), suffix)) || hour() < 7 {
 			continue
 		}
 		_, err := exec.Command("db2", "connect to bcas_dt user bcas using `1qaz").Output()
 		if err != nil {
 			log.Println(err)
 		}
-		num, err := exec.Command("db2", "SELECT count(*) FROM BCAS.D_PER_ACHV_2018 WHERE ETLDT = CURRENT_DATE - 1 DAY").Output()
+		num, err := exec.Command("db2", status).Output()
 		if err != nil {
 			log.Println(err)
 		}
-		zero, err := exec.Command("db2", "SELECT count(*) FROM BCAS.D_PER_ACHV_2018 WHERE ETLDT = '2019-01-01'").Output()
+		zero, err := exec.Command("db2", fmt.Sprintf("SELECT count(*) FROM BCAS.D_PER_ACHV_%s WHERE ETLDT = '%s'",
+			time.Now().Format("2006"), zeros)).Output()
 		if err != nil {
 			log.Println(err)
 		}
 		// fmt.Printf("%s\n", out)
 		if string(num) != string(zero) {
-			out, err := exec.Command("./expjx.sh").Output()
+			out, err := exec.Command(fmt.Sprintf("./exp%s.sh", suffix)).Output()
 			if err != nil {
 				log.Println(err)
 			}

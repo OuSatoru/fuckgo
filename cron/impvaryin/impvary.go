@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/OuSatoru/fuckgo/cron/common"
+	"github.com/OuSatoru/fuckgo/common"
 )
 
 var wg sync.WaitGroup
@@ -17,7 +17,7 @@ func main() {
 	go task("bl")
 	go task("jx")
 	go task("zb")
-
+	go task("jxsjyh")
 	wg.Wait()
 }
 
