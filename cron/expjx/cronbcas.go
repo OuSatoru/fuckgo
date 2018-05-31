@@ -15,7 +15,7 @@ var wg sync.WaitGroup
 func main() {
 	wg.Add(1)
 	go task1("jx", "SELECT count(*) FROM BCAS.D_PER_ACHV_%s WHERE ETLDT = %s")
-	go task1("jxsjyh", "SELECT count(*) FROM BCAS.D_PER_ACHV_%s WHERE ETLDT = %s AND FORMULA_CODE LIKE '57%'")
+	go task1("jxsjyh", "SELECT count(*) FROM BCAS.D_PER_ACHV_%s WHERE ETLDT = %s AND FORMULA_CODE LIKE '57%%'")
 	wg.Wait()
 }
 
@@ -37,11 +37,12 @@ func task1(suffix, statusy string) {
 		if err != nil {
 			log.Println(err)
 		}
-		zero, err := exec.Command("db2", fmt.Sprintf("SELECT count(*) FROM BCAS.D_PER_ACHV_%s WHERE ETLDT = '%s'",
-			time.Now().Format("2006"), zeros)).Output()
+		log.Println(status)
+		zero, err := exec.Command("db2", zeros).Output()
 		if err != nil {
 			log.Println(err)
 		}
+		log.Println(zeros)
 		// fmt.Printf("%s\n", out)
 		if string(num) != string(zero) {
 			out, err := exec.Command(fmt.Sprintf("./exp%s.sh", suffix)).Output()

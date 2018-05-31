@@ -48,7 +48,7 @@ type topic struct {
 }
 
 func main() {
-	watchDir("F:\\Work\\Go\\src\\github.com\\OuSatoru\\fuckgo\\fuck\\examtest\\e84")
+	fmt.Println(fmt.Sprintf("sdff%ssdf2ws%%'", "233333"))
 }
 
 func watchDir(dir string) {

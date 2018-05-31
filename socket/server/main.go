@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	listen, err := net.Listen("tcp", ":2333")
+	listen, err := net.Listen("tcp", ":12345")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -31,7 +31,8 @@ func handleConn(conn net.Conn) {
 	buf := make([]byte, 4096)
 	_, err := conn.Read(buf)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
+		return
 	}
 	conn.Write([]byte("收到"))
 }
