@@ -5,11 +5,18 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"path"
+	"path/filepath"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/OuSatoru/fuckgo/common"
+)
+
+var (
+	wg sync.WaitGroup
 )
 
 type jsonTime time.Time
@@ -48,7 +55,42 @@ type topic struct {
 }
 
 func main() {
-	fmt.Println(fmt.Sprintf("sdff%ssdf2ws%%'", "233333"))
+	e, err := strconv.Atoi("\x32")
+	fmt.Print(e, err)
+}
+
+func task() {
+	ticker := time.NewTicker(10 * time.Second)
+	for {
+		<-ticker.C
+		dir := "F:\\Work\\Go\\src"
+		if common.Exists(dir+"/ok.end") || common.Exists(dir+"/ok.lock") {
+			continue
+		}
+		lock, _ := common.CreateFile(dir + "/ok.lock")
+		lock.Close()
+		filepath.Walk(dir, func(p string, f os.FileInfo, err error) error {
+			if f == nil {
+				return err
+			}
+			if f.IsDir() {
+				return nil
+			}
+			if path.Ext(p) == ".go" {
+				wg.Add(1)
+				go func() {
+					fmt.Println(p)
+					wg.Done()
+				}()
+
+			}
+
+			return nil
+		})
+
+		wg.Wait()
+		os.Rename(dir+"/ok.lock", dir+"/ok.end")
+	}
 }
 
 func watchDir(dir string) {

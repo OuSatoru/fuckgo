@@ -29,7 +29,7 @@ func task1(suffix, statusy string) {
 		if exists(fmt.Sprintf("/fr/data/xms/%s.%s", yesterday(), suffix)) || hour() < 7 {
 			continue
 		}
-		_, err := exec.Command("db2", "connect to bcas_dt user bcas using `1qaz").Output()
+		_, err := exec.Command("db2", "connect to bcas user dtbcas using dtbcas").Output()
 		if err != nil {
 			log.Println(err)
 		}
