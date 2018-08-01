@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net"
 	"os"
@@ -20,11 +19,17 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// _, err = conn.Write([]byte("HEAD / HTTP/1.0\r\n\r\n"))
+	defer conn.Close()
+	_, err = conn.Write([]byte("HEAD / HTTP/1.0\r\n\r\n"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	// result, err := ioutil.ReadAll(conn)
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
-	result, err := ioutil.ReadAll(conn)
+	result := make([]byte, 4000)
+	_, err = conn.Read(result)
 	if err != nil {
 		log.Fatal(err)
 	}

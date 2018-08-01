@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"path"
 	"path/filepath"
@@ -55,8 +56,7 @@ type topic struct {
 }
 
 func main() {
-	e, err := strconv.Atoi("\x32")
-	fmt.Print(e, err)
+	
 }
 
 func task() {

@@ -3,27 +3,55 @@ package main
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 
+	"github.com/go-ldap/ldap"
+	_ "github.com/mattn/go-oci8"
 	"golang.org/x/text/encoding/unicode"
-	"gopkg.in/ldap.v2"
 )
 
-const (
-	admin    = "-"
-	adminpwd = "-"
+type config struct {
+	LDAPAdmin    string `json:"ldap_admin"`
+	LDAPPassword string `json:"ldap_password"`
+	OAAdmin      string `json:"oa_admin"`
+	OAPassword   string `json:"oa_password"`
+}
+
+var (
+	ldapAdmin    string
+	ldapPassword string
+	oaAdmin      string
+	oaPassword   string
 )
+
+func init() {
+	cb, err := ioutil.ReadFile("config.json")
+	if err != nil {
+		log.Fatalf("read config file err: %v", err)
+	}
+	var c config
+	err = json.Unmarshal(cb, &c)
+	if err != nil {
+		log.Fatalf("read from config err: %v", err)
+	}
+	ldapAdmin = c.LDAPAdmin
+	ldapPassword = c.LDAPPassword
+	oaAdmin = c.OAAdmin
+	oaPassword = c.OAPassword
+}
 
 func main() {
+	fmt.Println(ldapAdmin, ldapPassword, oaAdmin, oaPassword)
 	l, err := ldap.Dial("tcp", fmt.Sprintf("%s:%d", "dtrcb.net", 389))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer l.Close()
 
-	err = l.Bind(admin, adminpwd)
+	err = l.Bind(ldapAdmin, ldapPassword)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,7 +72,7 @@ func main() {
 	}
 	defer ls.Close()
 
-	err = ls.Bind(admin, adminpwd)
+	err = ls.Bind(ldapAdmin, ldapPassword)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -58,10 +86,11 @@ func main() {
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
-	err = ModifyPasswordAD(ls, "09800903", "17625094474", "13401766862")
-	if err != nil {
-		log.Fatal(err)
-	}
+
+	// err = ModifyPasswordAD(ls, "09800903", "17625094474", "13401766862")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 }
 
 func SearchUser(l *ldap.Conn, username string) string {
@@ -85,7 +114,7 @@ func SearchUser(l *ldap.Conn, username string) string {
 }
 
 func VerifyUser(l *ldap.Conn, username, password string) bool {
-	defer l.Bind(admin, adminpwd)
+	defer l.Bind(ldapAdmin, ldapPassword)
 	search := ldap.NewSearchRequest(
 		"dc=dtrcb, dc=net",
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
@@ -111,7 +140,7 @@ func VerifyUser(l *ldap.Conn, username, password string) bool {
 
 func AddUser(l *ldap.Conn, cn, ou1, ou2, ou3, sn, gn, mobile string) error {
 	dn := fmt.Sprintf("cn=%s,ou=%s,ou=%s,ou=%s,dc=dtrcb,dc=net", cn, ou1, ou2, ou3)
-	add := ldap.NewAddRequest(dn)
+	add := ldap.NewAddRequest(dn, nil)
 	add.Attribute("cn", []string{cn})
 	add.Attribute("objectClass", []string{"user"})
 	add.Attribute("sn", []string{sn})
@@ -125,12 +154,14 @@ func AddUser(l *ldap.Conn, cn, ou1, ou2, ou3, sn, gn, mobile string) error {
 		return err
 	}
 	// https://github.com/go-ldap/ldap/issues/106
-	modReq := &ldap.ModifyRequest{
-		DN: dn,
-		ReplaceAttributes: []ldap.PartialAttribute{
-			{Type: "userAccountControl", Vals: []string{"512"}},
-		},
-	}
+	modReq := ldap.NewModifyRequest(dn, nil)
+	modReq.Replace("userAccountControl", []string{"512"})
+	// modReq := &ldap.ModifyRequest{
+	// 	DN: dn,
+	// 	ReplaceAttributes: []ldap.PartialAttribute{
+	// 		{Type: "userAccountControl", Vals: []string{"512"}},
+	// 	},
+	// }
 	return l.Modify(modReq)
 }
 
@@ -141,7 +172,7 @@ func DelUser(l *ldap.Conn, cn string) error {
 }
 
 func ModifyUser(l *ldap.Conn, method, user, attr string, val []string) error {
-	modify := ldap.NewModifyRequest(user)
+	modify := ldap.NewModifyRequest(user, nil)
 	switch method {
 	case "add":
 		modify.Add(attr, val)
@@ -165,17 +196,19 @@ func ModifyPasswordAD(l *ldap.Conn, username, oldPwd, newPwd string) error {
 		return err
 	}
 	toMod := SearchUser(l, username)
-	passReq := &ldap.ModifyRequest{
-		DN: toMod,
-		ReplaceAttributes: []ldap.PartialAttribute{
-			{Type: "unicodePwd", Vals: []string{pwdEncoded}},
-		},
-	}
+	passReq := ldap.NewModifyRequest(toMod, nil)
+	passReq.Replace("unicodePwd", []string{pwdEncoded})
+	// passReq := &ldap.ModifyRequest{
+	// 	DN: toMod,
+	// 	ReplaceAttributes: []ldap.PartialAttribute{
+	// 		{Type: "unicodePwd", Vals: []string{pwdEncoded}},
+	// 	},
+	// }
 	return l.Modify(passReq)
 }
 
 func ModifyPasswordLDAP(l *ldap.Conn, username, oldPwd, newPwd string) error {
-	defer l.Bind(admin, adminpwd)
+	defer l.Bind(ldapAdmin, ldapPassword)
 	toMod := SearchUser(l, username)
 	err := l.Bind(toMod, oldPwd)
 	if err != nil {

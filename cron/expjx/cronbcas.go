@@ -16,6 +16,7 @@ func main() {
 	wg.Add(1)
 	go task1("jx", "SELECT count(*) FROM BCAS.D_PER_ACHV_%s WHERE ETLDT = %s")
 	go task1("jxsjyh", "SELECT count(*) FROM BCAS.D_PER_ACHV_%s WHERE ETLDT = %s AND FORMULA_CODE LIKE '57%%'")
+	go task1("jxdk", "SELECT count(*) FROM BCAS.D_PER_ACHV_%s WHERE ETLDT = %s AND FORMULA_CODE = '11000000'")
 	wg.Wait()
 }
 
@@ -29,7 +30,7 @@ func task1(suffix, statusy string) {
 		if exists(fmt.Sprintf("/fr/data/xms/%s.%s", yesterday(), suffix)) || hour() < 7 {
 			continue
 		}
-		_, err := exec.Command("db2", "connect to bcas user dtbcas using dtbcas").Output()
+		_, err := exec.Command("db2", "connect to bcas user bcas using bcas").Output()
 		if err != nil {
 			log.Println(err)
 		}

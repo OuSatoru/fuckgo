@@ -10,7 +10,7 @@ import (
 
 func main() {
 	db, err := sql.Open("odbc", fmt.Sprintf("driver={%s};hostname=%s;port=%d;database=%s;uid=%s;pwd=%s",
-		"IBM DATA SERVER DRIVER for ODBC - F:/Work/db/clidriver", "ip", 60000, "db", "user", "using"))
+		"IBM DATA SERVER DRIVER for ODBC - F:/Work/clidriver", "ip", 60000, "db", "user", "using"))
 	if err != nil {
 		log.Fatal(err)
 	}

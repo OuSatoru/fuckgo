@@ -13,3 +13,4 @@ build
 *.pem
 *_linux_amd64
 examtest
+config.json

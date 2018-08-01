@@ -17,6 +17,7 @@ func main() {
 	go task("rh")
 	go task("yq")
 	go task("jx")
+	go task("jxdk")
 	go task("jxsjyh")
 	wg.Wait()
 }
