@@ -1,11 +1,11 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
 	"path"
 	"path/filepath"
@@ -56,7 +56,9 @@ type topic struct {
 }
 
 func main() {
-	
+	b := `MIIB6DCCAY6gAwIBAgIJAIvE98aKIBc5MAoGCCqBHM9VAYN1ME8xCzAJBgNVBAYTAkNOMRAwDgYDVQQIDAdKaWFuZ3N1MQ4wDAYDVQQKDAVEVFJDQjELMAkGA1UECwwCSVQxETAPBgNVBAMMCFdhbmdDb25nMB4XDTE4MDcyMDA4NDExNVoXDTI4MDcxNzA4NDExNVowTzELMAkGA1UEBhMCQ04xEDAOBgNVBAgMB0ppYW5nc3UxDjAMBgNVBAoMBURUUkNCMQswCQYDVQQLDAJJVDERMA8GA1UEAwwIV2FuZ0NvbmcwWTATBgcqhkjOPQIBBggqgRzPVQGCLQNCAAT1cWVgpFRX67TB95bdZmc6/GD4t7FT7D84K+Eo6gxpXKrAHj0yKQiMPS/LKGnhe+onM7Q5/ZSMxZSap+R1ObgWo1MwUTAdBgNVHQ4EFgQUKaTPcikhDk0ed+wQELC0C19hszEwHwYDVR0jBBgwFoAUKaTPcikhDk0ed+wQELC0C19hszEwDwYDVR0TAQH/BAUwAwEB/zAKBggqgRzPVQGDdQNIADBFAiBa9ZXKoZW8lHRTzdewf6gJn2Dwm92fz985Bzx4GYV2LAIhAOmhMjiuc8iGdqmDDpBXCqDvyxRi28fDnKQdaJjgo9w0`
+	b2, _ := base64.StdEncoding.DecodeString(b)
+	ioutil.WriteFile("dt.cer", b2, 0666)
 }
 
 func task() {
