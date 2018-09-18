@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"sync"
 	"time"
@@ -55,8 +56,17 @@ type topic struct {
 }
 
 func main() {
-	fmt.Println(33 / 5)
-	fmt.Println(33 % 5)
+	al, err := ioutil.ReadFile("C:\\Users\\w\\Desktop\\help\\全市人口信息.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	spaces := regexp.MustCompile(`\x20+`)
+
+	alr := spaces.ReplaceAll(al, []byte(","))
+	err = ioutil.WriteFile("C:\\Users\\w\\Desktop\\help\\全市人口信息2.txt", alr, 0666)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func task() {
