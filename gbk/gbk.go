@@ -19,3 +19,13 @@ func UTF8toGBK(u string) string {
 	data, _ := ioutil.ReadAll(transform.NewReader(bytes.NewReader(ub), simplifiedchinese.GBK.NewEncoder()))
 	return string(data)
 }
+
+func GBKtoUTF8btye(g []byte) []byte {
+	data, _ := ioutil.ReadAll(transform.NewReader(bytes.NewReader(g), simplifiedchinese.GBK.NewDecoder()))
+	return data
+}
+
+func UTF8toGBKbyte(u []byte) []byte {
+	data, _ := ioutil.ReadAll(transform.NewReader(bytes.NewReader(u), simplifiedchinese.GBK.NewEncoder()))
+	return data
+}
