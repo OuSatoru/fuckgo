@@ -9,7 +9,7 @@ import (
 
 func main() {
 	http.HandleFunc("/verify", verifyHandler)
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":7474", nil)
 }
 
 func verifyHandler(w http.ResponseWriter, r *http.Request) {
