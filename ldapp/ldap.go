@@ -24,7 +24,7 @@ var (
 	oaAdmin      string
 	oaPassword   string
 
-	l *ldap.Conn
+	// l *ldap.Conn
 	// ls *ldap.Conn
 )
 
@@ -44,15 +44,15 @@ func init() {
 	oaPassword = c.OAPassword
 	fmt.Println(ldapAdmin, ldapPassword, oaAdmin, oaPassword)
 
-	l, err = ldap.Dial("tcp", fmt.Sprintf("%s:%d", "32.185.14.97", 389))
-	if err != nil {
-		log.Fatal(err)
-	}
+	// l, err = ldap.Dial("tcp", fmt.Sprintf("%s:%d", "32.185.14.97", 389))
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	err = l.Bind(ldapAdmin, ldapPassword)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// err = l.Bind(ldapAdmin, ldapPassword)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	// pool := x509.NewCertPool()
 	// pem, err := ioutil.ReadFile("dtrcb-root.pem")
@@ -77,6 +77,11 @@ func init() {
 
 // SearchUser return DN of user
 func SearchUser(username string) (string, error) {
+	l, err := newLdap()
+	if err != nil {
+		return "", err
+	}
+	defer l.Close()
 	search := ldap.NewSearchRequest(
 		"dc=dtrcb, dc=net",
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
@@ -97,6 +102,11 @@ func SearchUser(username string) (string, error) {
 }
 
 func VerifyUser(username, password string) error {
+	l, err := newLdap()
+	if err != nil {
+		return err
+	}
+	defer l.Close()
 	defer l.Bind(ldapAdmin, ldapPassword)
 	userdn, err := SearchUser(username)
 	if err != nil {
@@ -111,6 +121,11 @@ func VerifyUser(username, password string) error {
 }
 
 func AddUser(cn, ou1, ou2, ou3, sn, gn, mobile string) error {
+	l, err := newLdap()
+	if err != nil {
+		return err
+	}
+	defer l.Close()
 	dn := fmt.Sprintf("cn=%s,ou=%s,ou=%s,ou=%s,dc=dtrcb,dc=net", cn, ou1, ou2, ou3)
 	add := ldap.NewAddRequest(dn, nil)
 	add.Attribute("cn", []string{cn})
@@ -121,7 +136,7 @@ func AddUser(cn, ou1, ou2, ou3, sn, gn, mobile string) error {
 	add.Attribute("userPrincipalName", []string{fmt.Sprintf("%s@dtrcb.net", cn)})
 	add.Attribute("sAMAccountname", []string{cn})
 	add.Attribute("userpassword", []string{mobile})
-	err := l.Add(add)
+	err = l.Add(add)
 	if err != nil {
 		return err
 	}
@@ -138,6 +153,11 @@ func AddUser(cn, ou1, ou2, ou3, sn, gn, mobile string) error {
 }
 
 func DelUser(l *ldap.Conn, cn string) error {
+	l, err := newLdap()
+	if err != nil {
+		return err
+	}
+	defer l.Close()
 	toDel, err := SearchUser(cn)
 	if err != nil {
 		return err
@@ -147,6 +167,11 @@ func DelUser(l *ldap.Conn, cn string) error {
 }
 
 func ModifyUser(l *ldap.Conn, method, user, attr string, val []string) error {
+	l, err := newLdap()
+	if err != nil {
+		return err
+	}
+	defer l.Close()
 	modify := ldap.NewModifyRequest(user, nil)
 	switch method {
 	case "add":
@@ -156,7 +181,7 @@ func ModifyUser(l *ldap.Conn, method, user, attr string, val []string) error {
 	case "replace":
 		modify.Replace(attr, val)
 	}
-	err := l.Modify(modify)
+	err = l.Modify(modify)
 	if err != nil {
 		return err
 	}
@@ -201,6 +226,11 @@ func ModifyUser(l *ldap.Conn, method, user, attr string, val []string) error {
 // }
 
 func ModifyDN(l *ldap.Conn, username, ou1, ou2, ou3 string) error {
+	l, err := newLdap()
+	if err != nil {
+		return err
+	}
+	defer l.Close()
 	toMod, err := SearchUser(username)
 	if err != nil {
 		return err
@@ -208,4 +238,16 @@ func ModifyDN(l *ldap.Conn, username, ou1, ou2, ou3 string) error {
 	modRequest := ldap.NewModifyDNRequest(toMod, fmt.Sprintf("cn=%s", username), true, fmt.Sprintf(
 		"ou=%s,ou=%s,ou=%s,dc=dtrcb,dc=net", ou1, ou2, ou3))
 	return l.ModifyDN(modRequest)
+}
+
+func newLdap() (*ldap.Conn, error) {
+	l, err := ldap.Dial("tcp", fmt.Sprintf("%s:%d", "32.185.14.97", 389))
+	if err != nil {
+		return nil, err
+	}
+	err = l.Bind(ldapAdmin, ldapPassword)
+	if err != nil {
+		return nil, err
+	}
+	return l, nil
 }
