@@ -19,7 +19,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	tables := strings.Split(string(tablesf), " ")
+	tables := strings.Split(strings.TrimRight(string(tablesf), "\n"), " ")
 	fmt.Println(tables)
 	wg.Add(1)
 	for _, table := range tables {
