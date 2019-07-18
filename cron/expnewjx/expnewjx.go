@@ -18,7 +18,7 @@ func main() {
 }
 
 func task(suffix, statusy string) {
-	ticker := time.NewTicker(20 * time.Second)
+	ticker := time.NewTicker(3 * time.Minute)
 	for {
 		<-ticker.C
 		status := fmt.Sprintf(statusy, "current_date - 1 day")
