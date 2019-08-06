@@ -14,3 +14,4 @@ build
 *_linux_amd64
 examtest
 config.json
+.DS_Store

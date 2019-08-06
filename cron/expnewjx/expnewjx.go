@@ -18,10 +18,10 @@ func main() {
 }
 
 func task(suffix, statusy string) {
-	ticker := time.NewTicker(3 * time.Minute)
+	ticker := time.NewTicker(5 * time.Minute)
 	for {
 		<-ticker.C
-		status := fmt.Sprintf(statusy, "current_date - 1 day")
+		status := fmt.Sprintf(statusy, "'"+time.Now().AddDate(0, 0, -1).Format("2006-01-02")+"'")
 		zeros := fmt.Sprintf(statusy, "'"+time.Now().AddDate(1, 0, 0).Format("2006-01-02")+"'")
 		if exists(fmt.Sprintf("/fr/data/xms/%s.end%s", yesterday(), suffix)) {
 			continue
