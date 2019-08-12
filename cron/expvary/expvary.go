@@ -16,6 +16,7 @@ func main() {
 	wg.Add(1)
 	go task1("rh", "SELECT max(sjrq) FROM REPORT.ODS_RHRBTJB")
 	go task2("yq", "select jssj from report.fdm_sjrq")
+	go task2("pgcz", "select jssj from report.fdm_sjrq")
 	wg.Wait()
 }
 
