@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>文件上传</title>
+    <script src="static/js/vue.js"></script>
+    <script src="static/js/vue-resource.js"></script>
+</head>
+<body>
+<div id="app">
+    <input type="file" @change="getFile($event)" />
+    <br>
+    <button @click="upload">上传</button>
+    <br>
+    二维码
+    <br>
+    <img :src="qrSrc" alt="">
+    <br>
+    文件名
+    <br>
+    {{ filename }}
+</div>
+<script>
+new Vue({
+    el: '#app',
+    data: {
+        filePath: '',
+        qrSrc: '',
+        filename: ''
+    },
+    methods: {
+        getFile: function (evt) {
+            this.filePath = evt.target.files[0]
+        },
+
+        upload: function () {
+            var zipFormData = new FormData();
+            let config = { headers: { 'Content-Type': 'multipart/form-data' } };
+            zipFormData.append('uploadfile', this.filePath);
+            this.$http.post("/upload", zipFormData, config).then(function (response) {
+                console.log(response.data);
+                this.qrSrc = response.data.qr_url;
+                this.filename = response.data.filename
+            })
+        }
+    }
+})
+</script>
+</body>
+</html>
