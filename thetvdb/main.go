@@ -1,19 +1,43 @@
 package main
 
 import (
+	"io"
 	"log"
 	"net/http"
-	"net/http/httputil"
-	"net/url"
 )
 
+var client = http.DefaultClient
+
 func main() {
-	ur, err := url.Parse("https://www.thetvdb.com")
+	http.HandleFunc("/", tvHandler)
+	if err := http.ListenAndServe(":19999", nil); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func tvHandler(w http.ResponseWriter, r *http.Request) {
+	body := r.Body
+	req, err := http.NewRequest(r.Method, "https://www.thetvdb.com"+r.RequestURI, body)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	proxy := httputil.NewSingleHostReverseProxy(ur)
-	if err := http.ListenAndServe(":19999", proxy); err != nil {
-		log.Fatal(err)
+	for k, vv := range r.Header {
+		for _, v := range vv {
+			req.Header.Add(k, v)
+		}
 	}
+	resp, err := client.Do(req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+	for k, vv := range resp.Header {
+		for _, v := range vv {
+			w.Header().Add(k, v)
+		}
+	}
+	w.WriteHeader(resp.StatusCode)
+	io.Copy(w, resp.Body)
 }
